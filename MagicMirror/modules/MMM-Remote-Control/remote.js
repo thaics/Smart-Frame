@@ -1,5 +1,81 @@
 // main javascript file for the remote control page
 /* jshint esversion: 6 */
+function SFrameObj(){
+    obj = {
+        connect : function() {
+          obj.client.connect({onSuccess: obj.onConnect, onFailure: obj.onFailure});
+        },
+
+        onFailure : function(response) {
+          console.log(response);
+        },
+
+        onConnect : function(response) {
+          obj.client.subscribe("devices/b827ebda3cc0/smart_frame/update_media", {qos:1});
+        },
+        
+        sendConfigChange : function() {
+            status : {
+                image_id : "image_id",
+                success : true
+            }
+            configJson = JSON.stringify(status);
+            message = new Paho.MQTT.Message(configJson);
+            message.destinationName = "devices/b827ebda3cc0/smart_frame/updated";
+            message.qos = 1;
+            obj.client.send(message);
+        },
+
+        onMessageArrived : function(message) {
+            payload = JSON.parse(message.payloadString);
+            new_media_id = payload.image_id;
+            var fs = require("fs"), request = require('request');
+
+            var download = function(uri, filename, callback){
+                request.head(uri, function(err, res, body){
+                    console.log('content-type:', res.headers['content-type']);
+                    console.log('content-length:', res.headers['content-length']);
+                
+                    request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+                });
+            };
+
+            try {
+                fs.unlinkSync('/home/thai/images/cat.gif');
+            } catch (err){
+                console.error(err);
+            }
+
+            download(new_media_id, '/home/thai/images/new_img.png' +, function(){
+                console.log('done');
+            });
+
+            Remote.sendSocketNotification("BACKGROUNDSLIDESHOW_UPDATE_IMAGE_LIST", { action: "EMPTY" });
+        },
+
+        updateUI : function() {
+          if(obj.isManipulatingSlider) {
+            return;
+          }
+
+          setSliderValues(obj.lampState.color.h,
+            obj.lampState.color.s,
+            obj.lampState.brightness);
+          obj.updatePowerButton();
+          obj.updateUIColors();
+        },
+
+        client : new Paho.MQTT.Client("localhost", 1883, "remote_client"),
+
+        init : function() {
+            obj.client.onMessageArrived = obj.onMessageArrived;
+            obj.connect();
+        },
+    };
+
+    obj.init();
+    return obj;
+}   
 
 var Remote = {
     name: "MMM-Remote-Control",
@@ -1759,6 +1835,8 @@ var buttons = {
         Remote.sendSocketNotification("REMOTE_ACTION", { action: "HIDE_ALERT" });
     }
 };
+
+var SFrame = SFrameObj();
 
 // Initialize socket connection
 Remote.sendSocketNotification("REMOTE_CLIENT_CONNECTED");

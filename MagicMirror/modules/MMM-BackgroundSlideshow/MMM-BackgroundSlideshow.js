@@ -171,7 +171,7 @@ Module.register('MMM-BackgroundSlideshow', {
   // generic notification handler
   notificationReceived: function (notification, payload, sender) {
     if (sender) {
-      // Log.log(this.name + " received a module notification: " + notification + " from sender: " + sender.name);
+      console.log(this.name + " received a module notification: " + notification + " from sender: " + sender.name);
       if (notification === 'BACKGROUNDSLIDESHOW_UPDATE_IMAGE_LIST') {
         this.imageIndex = -1;
         this.updateImageList();

@@ -38,7 +38,7 @@ let config = {
 			module: 'MMM-BackgroundSlideshow',
 			position: 'fullscreen_below',
 			config: {
-			  imagePaths: ['/home/thai/images/'],
+			  imagePaths: ['/home/thai/images'],
 			  showImageInfo: true,
 			  sortImagesBy: 'created',
 			}

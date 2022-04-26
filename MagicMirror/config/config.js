@@ -31,10 +31,6 @@ let config = {
 
 	modules: [
 		{
-			module: "clock",
-			position: "top_left"
-		},
-		{
 			module: 'MMM-BackgroundSlideshow',
 			position: 'fullscreen_below',
 			config: {
@@ -45,8 +41,6 @@ let config = {
 		 },
 		 {
 		    module: 'MMM-Remote-Control',
-		    // uncomment the following line to show the URL of the remote control on the mirror
-		    position: 'bottom_left',
 		    // you can hide this module afterwards from the remote control itself
 		    config: {
 		        customCommand: {},  // Optional, See "Using Custom Commands" below
@@ -58,6 +52,26 @@ let config = {
 		        // classes: {} // Optional, See "Custom Classes" below
 		    }
 		},
+		{
+			module: 'MMM-MQTT',
+			header: 'MQTT',
+			config: {
+				logging: true,
+				useWildcards: false,
+				mqttServers: [
+					{
+						address: 'localhost',          // Server address or IP address
+						port: '1883',                  // Port number if other than default
+						clientId: 'mirror',         // Custom MQTT client ID (optional)
+						subscriptions: [
+							{
+								topic: 'smart_frame/update_media'
+							}
+						]
+					}
+				]
+			}
+}
 	]
 };
 

@@ -1,5 +1,4 @@
-// main javascript file for the remote control page
-/* jshint esversion: 6 */
+
 function SFrameObj(){
     obj = {
         connect : function() {
@@ -14,22 +13,28 @@ function SFrameObj(){
           obj.client.subscribe("devices/b827ebda3cc0/smart_frame/update_media", {qos:1});
         },
         
-        sendConfigChange : function() {
+        alertMediaChanged : function(img_url) {
             status : {
-                image_id : "image_id",
+                cur_img: img_url,
                 success : true
             }
+
             configJson = JSON.stringify(status);
             message = new Paho.MQTT.Message(configJson);
             message.destinationName = "devices/b827ebda3cc0/smart_frame/updated";
             message.qos = 1;
+            message.retain = true;
+
             obj.client.send(message);
         },
 
         onMessageArrived : function(message) {
             payload = JSON.parse(message.payloadString);
-            new_media_id = payload.image_id;
-            var fs = require("fs"), request = require('request');
+            media_url = payload.media_url;
+            message = payload.message;
+            file_name = media_url.split("/").pop();
+            file_dir = '/home/thai/images';
+            var fs = require("fs"), request = require('request'), path = require('path');
 
             var download = function(uri, filename, callback){
                 request.head(uri, function(err, res, body){
@@ -40,29 +45,17 @@ function SFrameObj(){
                 });
             };
 
-            try {
-                fs.unlinkSync('/home/thai/images/cat.gif');
-            } catch (err){
-                console.error(err);
-            }
+            // Deletes all images currently in media directory
+            readdirSync(file_dir).forEach(f => rmSync(`${file_dir}/${f}`));
 
-            download(new_media_id, '/home/thai/images/new_img.png' +, function(){
-                console.log('done');
+            // Downloads new media into media directory
+            download(new_media_id, file_dir + '/' + file_name , function(){
+                console.log('Download completed!');
             });
 
+            // Alerts smart-frame of new image uploaded and to update picture
             Remote.sendSocketNotification("BACKGROUNDSLIDESHOW_UPDATE_IMAGE_LIST", { action: "EMPTY" });
-        },
-
-        updateUI : function() {
-          if(obj.isManipulatingSlider) {
-            return;
-          }
-
-          setSliderValues(obj.lampState.color.h,
-            obj.lampState.color.s,
-            obj.lampState.brightness);
-          obj.updatePowerButton();
-          obj.updateUIColors();
+            obj.alertMediaChanged(media_url, true);
         },
 
         client : new Paho.MQTT.Client("localhost", 1883, "remote_client"),

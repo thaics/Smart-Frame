@@ -34,7 +34,7 @@ module.exports = NodeHelper.create({
       media_url = data.media_url;
       attached_message = data.message;
       file_name = media_url.split("/").pop();
-      dir = 'home/thai/images'
+      dir = '/home/thai/images'
       
       var fs = require("fs"), request = require('request');
       

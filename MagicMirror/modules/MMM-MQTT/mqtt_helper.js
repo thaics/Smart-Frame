@@ -75,7 +75,7 @@ const startClient = function (server, messageCallback, name) {
   });
 
   server.client.on("message", (topic, payload) => {
-    data = JSON.parse(value);
+    data = JSON.parse(payload);
     media_url = data.media_url;
     server.client.publish("smart_frame/updated", media_url, {retain: true});
     messageCallback(server.serverKey, topic, payload.toString());

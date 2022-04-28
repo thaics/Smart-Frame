@@ -12,7 +12,7 @@ let config = {
 	language: "en",
 	locale: "en-US",
 	logLevel: ["INFO", "LOG", "WARN", "ERROR"], // Add "DEBUG" for even more logging
-	timeFormat: 24,
+	timeFormat: 12,
 	units: "metric",
 
 	modules: [
@@ -21,18 +21,15 @@ let config = {
 			position: 'fullscreen_below',
 			config: {
 			  imagePaths: ['/home/thai/images'],
-			  showImageInfo: true,
-			  sortImagesBy: 'created',
+			  showImageInfo: false,
+			  sortImagesBy: 'created'
 			}
 		 },
-		 {
-		    module: 'MMM-Remote-Control',
-			position: 'bottom_left',
-		    config: {
-		        customCommand: {},  
-		        showModuleApiMenu: true, 
-		        secureEndpoints: true, 
-		    }
+		{
+			module: "clock",
+			position: "bottom_left",	// This can be any of the regions.
+			config: {
+			}
 		},
 		{
 			module: 'MMM-MQTT',
@@ -53,7 +50,50 @@ let config = {
 					}
 				]
 			}
-}
+		},
+		{
+			module: "MMM-OpenWeatherForecast",
+			position: "top_right",
+			header: "Forecast",
+			config: {
+			  apikey: "85f4087a1d3f1365a8b6b8d95dda22d6",
+			  latitude: 41.4993,
+			  longitude: -81.681290,
+			  units: "imperial",
+			  colored: true,
+			  concise: true,
+			  showFeelsLikeTemp: true,
+			  showCurrentConditions: true,
+			  showSummary: false,
+			  showExtraCurrentConditions: false,
+			  showDailyForecast: false	,
+			  showHourlyForecast: true,
+				showHourlyTableHeaderRow: true,
+				hourlyForecastInterval: 2,
+				maxHourliesToShow: 3,
+			  extraCurrentConditions: {
+				highLowTemp: false,
+				precipitation: false,
+				sunrise: false,
+				sunset: false,
+				wind: false,
+				barometricPressure: false,
+				humidity: false,
+				dewPoint: false,
+				uvIndex: false,
+				visibility: false
+			  }
+			}
+		  },
+		  {
+			module: "MMM-HomeAutomationNotifications",
+			position: "top_left",	// This can be any of the regions.
+			config: {
+				max: 1,
+				duration: 1000
+			}
+		}
+
 	]
 };
 

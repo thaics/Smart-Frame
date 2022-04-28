@@ -520,13 +520,6 @@ Module.register('MMM-BackgroundSlideshow', {
               dateTime = '';
             }
           }
-          // TODO: allow for location lookup via openMaps
-          // let lat = EXIF.getTag(this, "GPSLatitude");
-          // let lon = EXIF.getTag(this, "GPSLongitude");
-          // // Only display the location if we have both longitute and lattitude
-          // if (lat && lon) {
-          //   // Get small map of location
-          // }
           this.updateImageInfo(imageinfo, dateTime);
         }
 

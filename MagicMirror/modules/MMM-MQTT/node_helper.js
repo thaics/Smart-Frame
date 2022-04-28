@@ -36,7 +36,7 @@ module.exports = NodeHelper.create({
       file_name = media_url.split("/").pop();
       dir = '/home/thai/images'
       
-      var fs = require("fs"), request = require('request');
+      var fs = require("fs"), request = require('request'), fetch = require('node-fetch');
       
       var download = function(uri, filename, callback){
           request.head(uri, function(err, res, body){
@@ -56,6 +56,16 @@ module.exports = NodeHelper.create({
       
       // Alert MMM system to local change
       this.sendSocketNotification("BACKGROUNDSLIDESHOW_UPDATE_IMAGE_LIST");
+      post_url = 'http://129.22.61.232:8080/MMM-HomeAutomationNotifications?type=INFO&message=';
+      attached_message = attached_message + " - sent by Thai"
+      post_message = attached_message.replace(" ", "%");
+      fetch(post_url + post_message, {
+        method: "POST",
+        headers: {'Content-Type': 'application/json'}, 
+        body: ""
+      }).then(res => {
+        console.log("Request complete! response:", res);
+      });
     };
 
     if (notification === "MQTT_CONFIG") {

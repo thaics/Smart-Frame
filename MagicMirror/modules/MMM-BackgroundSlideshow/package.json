@@ -6,8 +6,10 @@
   "license": "MIT",
   "dependencies": {
     "exif-js": "^2.3.0",
-    "lodash": "^4.17.21",
+    "fetch": "^1.1.0",
+    "fs": "^0.0.1-security",
     "jimp": "^0.16.1",
-    "jpeg-autorotate": "^8.0.1"
+    "jpeg-autorotate": "^8.0.1",
+    "lodash": "^4.17.21"
   }
 }

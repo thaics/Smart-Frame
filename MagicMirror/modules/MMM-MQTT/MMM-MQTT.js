@@ -16,7 +16,7 @@ Module.register("MMM-MQTT", {
   // Default module config
   defaults: {
     mqttServers: [],
-    logging: false,
+    logging: true,
     useWildcards: false
   },
 
@@ -114,6 +114,11 @@ Module.register("MMM-MQTT", {
     if (notification === "MQTT_PAYLOAD") {
       if (payload != null) {
         this.log("Received message: ", payload);
+        this.log(this.name);
+        data = JSON.parse(payload);
+        messageToShow = "New Message! : "  + data.message;
+        this.log("SENDING MEDIA MESSAGE: " + messageToShow);
+        this.sendNotification("MEDIA_MESSAGE", messageToShow);
         this.setSubscriptionValue(
           this.subscriptions,
           payload,

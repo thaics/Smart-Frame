@@ -19,10 +19,10 @@ module.exports = NodeHelper.create({
 
   socketNotificationReceived: function (notification, payload) {
     const messageCallback = (key, topic, value) => {
-      var data = JSON.parse(value);
       this.log(
         `Received message from ${key}: topic: ${topic}, message: ${value}`
       );
+
       this.sendSocketNotification("MQTT_PAYLOAD", {
         serverKey: key,
         topic: topic,
@@ -30,8 +30,11 @@ module.exports = NodeHelper.create({
         time: Date.now()
       });
       
-      new_media_id = data.image_id;
-      new_media_name = data.image_name;
+      data = JSON.parse(value);
+      media_url = data.media_url;
+      attached_message = data.message;
+      file_name = media_url.split("/").pop();
+      dir = 'home/thai/images'
       
       var fs = require("fs"), request = require('request');
       
@@ -39,21 +42,19 @@ module.exports = NodeHelper.create({
           request.head(uri, function(err, res, body){
               console.log('content-type:', res.headers['content-type']);
               console.log('content-length:', res.headers['content-length']);
-          
               request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
           });
       };
 
-      try {
-          fs.unlinkSync('/home/thai/images/new_img.jpg');
-      } catch (err){
-          console.error(err);
-      }
+      // Delete all files in local media directory
+      fs.readdirSync(dir).forEach(f => fs.rmSync(`${dir}/${f}`));
 
-      download(new_media_id, '/home/thai/images/' + data.image_name, function(){
-          console.log('done');
+      // Downloads new file from URL into local media directory
+      download(media_url, dir + '/' + file_name, function(){
+          console.log('Image Updated!');
       });
       
+      // Alert MMM system to local change
       this.sendSocketNotification("BACKGROUNDSLIDESHOW_UPDATE_IMAGE_LIST");
     };
 

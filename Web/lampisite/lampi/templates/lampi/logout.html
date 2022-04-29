@@ -1,7 +1,11 @@
 {% extends "lampi/base.html" %}
+{% load static %}
 
 {% block title %}Logged Out{% endblock %}
 
+{% block additional_head_content %}
+  <link rel="stylesheet" type="text/css" href="{% static 'lampi/css/site.css' %}"/>
+{% endblock %}  
 {% block content %}
   <p>Logged out</p>
 {% endblock %}

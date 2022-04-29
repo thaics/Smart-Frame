@@ -1,4 +1,9 @@
 {% extends "lampi/base.html" %}
+{% load static %}
+
+{% block additional_head_content %}
+<link rel="stylesheet" type="text/css" href="{% static 'lampi/css/site.css' %}"/>
+{% endblock %}
 
 {% block content %}
 
@@ -16,5 +21,3 @@
 {% endif %}
 
 {% endblock %}
-
-{% block page_event %}LAMPI List{% endblock %}

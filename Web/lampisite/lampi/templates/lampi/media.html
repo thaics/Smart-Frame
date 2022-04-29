@@ -4,23 +4,41 @@
 {% block title %}LAMPI{% endblock %}
 
 {% block additional_head_content %}
-<link rel="stylesheet" type="text/css" href="{% static 'lampi/css/lampi-sliders.css' %}">
+<style>
+  .frame {
+    width: 50%;
+    border: 3px solid #ccc;
+    background: #eee;
+    margin: auto;
+    padding: 15px 10px;
+  }
 
+  img {
+    width: 100%;
+    height: 100%;
+  }
 
-<style id="saturation-slider-style" type="text/css"></style>
-<style id="hue-thumb-style" type="text/css"></style>
-<style id="brightness-thumb-style" type="text/css"></style>
-<style id="saturation-thumb-style" type="text/css"></style>
+  body {background-color: burlywood;}
 
-<link rel="stylesheet" type="text/css" href="{% static 'lampi/css/site.css' %}"/>
+  .content {
+    width: 70%; /* Could be anything, but 75% works here. */
+    margin: auto;
+ }
+ a, h1, h2, label, p {
+    color: white;
+    text-align:center;
+}
+</style>
 {% endblock %}
 
 {% block links %}
-<a href="{% url 'lampi:detail' device.device_id %}">Lighting</a>  
+<a href="{% url 'lampi:detail' device.device_id %}">Lighting</a>
 <a href="{% url 'lampi:media' device.device_id %}">Media</a>
 {% endblock %}
 
 {% block content %}
+<div class="content">
+<h1> Smart Frame Media Control </h1>
 <script type="text/javascript">
   var window_global = {};
   window_global['device_id'] = "{{ device.device_id }}";
@@ -30,26 +48,18 @@
   };
 </script>
 
-<div id="top-pane">
-  <div id="sliders">
-    <input id="hue-slider" class="hue slider" type="range" min="0.0" max="1.0" step="0.01"></input>
-    <input id="saturation-slider" class="saturation slider" type="range" min="0.0" max="1.0" step="0.01"></input>
-    <input id="brightness-slider" class="brightness slider" type="range" min="0.0" max="1.0" step="0.01"></input>
+<div>
+  <h2>Current Media</h2>
+  <div class="frame">
+    <img id="cur_media" src="https://res.cloudinary.com/thai-cloudinary/image/upload/v1649884273/panda_opfuus.jpg">
   </div>
-</div>
-
-<div id="colorbox"></div>
-
-<div id="bottom-pane">
-  <div class="toggle-button" id="power"></div>
-</div>
-
-<div id="-pane">
+  <h2>Upload New Media</h2>
   <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
-  <button id="upload_widget" class="cloudinary-button">Upload files</button>
+  <button id="upload_widget" class="cloudinary-button" style="display:block; margin: 0 auto;">Upload files</button>
   <script type="text/javascript">
     var myWidget = cloudinary.createUploadWidget({
       cloudName: 'thai-cloudinary',
+      showAdvancedOptions: true,
       uploadPreset: 'smart_frame_upload',
       sources: ["local", "url"],
       theme: 'purple',
@@ -58,16 +68,24 @@
       },
       text: {
         "en": {
-          "queue": {
-            "title": "Files to upload",
-            "title_uploading_with_counter": "Uploading image to cloud ..."
-          }
+            "queue": {
+                "title": "Files to upload",
+                "title_uploading_with_counter": "Uploading image to cloud ..."
+            },
+            "advanced": "Add message",
+            "advanced_options": {
+                "public_id_ph": "Message to send with upload",
+                "tags_ph": "Add a tag",
+                "add_new": "Add a new tag:",
+                "upload_preset_placeholder": "Upload Preset"
+            },
         }
       }
 
     }, (error, result) => {
       if (!error && result && result.event === "success") {
         console.log('Done! Here is the image info: ', result.info);
+        update_media(result.info)
       }
     }
     )
@@ -76,6 +94,9 @@
       myWidget.open();
     }, false);
   </script>
+</div>
+</div>
+
 </div>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" type="text/javascript"></script>

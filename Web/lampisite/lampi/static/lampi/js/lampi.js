@@ -19,10 +19,14 @@ function LampiPage($){
 
         onConnect : function(response) {
           obj.client.subscribe("devices/" + deviceId + "/lamp/changed", {qos:1});
+          obj.client.subscribe("devices/" + deviceId + "/smart_frame/updated", {qos:1});
           obj.client.subscribe("$SYS/broker/connection/" + deviceId + "_broker/state", {qos:1});
         },
 
         onConnectionLost : function(responseObject) {
+          setTimeout(function(){
+            // wait before reconnecting
+          }, 2000);
           if (responseObject.errorCode !== 0) {
             console.log("onConnectionLost:" + responseObject.errorMessage);
             obj.connect();
@@ -34,7 +38,9 @@ function LampiPage($){
                 obj.onMessageConnectionState(message);
             } else if (message.destinationName.endsWith('changed')) {
                 obj.onMessageLampChanged(message);
-            } 
+            } else if (message.destinationName.endsWith('updated')) {
+              obj.onMessageMediaChanged(message);
+            }
         },
 
         onMessageConnectionState: function(message) {
@@ -64,18 +70,22 @@ function LampiPage($){
             obj.updated = true;
         },
 
+        onMessageMediaChanged: function(message) {
+          setTimeout(function(){
+            // wait before reconnecting
+          }, 3000);
+          new_url = message.payloadString;
+          $("#cur_media").attr("src", new_url);
+        },
+
         onPowerToggle : function(inputEvent) {
           obj.lampState.on = !obj.lampState.on;
           obj.updatePowerButton();
           obj.scheduleConfigChange();
-
-          mixpanel.track("Toggle Power", {"isOn": obj.lampState.on, "event_type": "ui"});
         },
 
         onSliderInput : function(inputEvent) {
           value = Number(inputEvent.target.value);
-          
-          mixpanel.track("Slider Change", {"slider": inputEvent.target.id, "value": value, "event_type": "ui"});
 
           if(inputEvent.target.id == "hue-slider") {
             obj.lampState.color.h = value;
@@ -154,7 +164,7 @@ function LampiPage($){
         updateTimer : null,
         isManipulatingSlider :false,
         updated: false,
-
+        
         init : function() {
 
             if( deviceId == "") {
@@ -188,5 +198,40 @@ function LampiPage($){
 
 jQuery(LampiPage);
 
+function update_media (info) {
+  console.log("input received", info);
 
+  media_url = info.url;
+  attached_message = info.public_id.replace('smartframe/', '');
+
+  media_detail = {
+    media_url: media_url,
+    message: attached_message
+  };
+
+  configJson = JSON.stringify(media_detail);
+
+  client = new Paho.MQTT.Client(hostAddress, Number(hostPort), "upload_handler");
+
+  client.onConnectionLost = onConnectionLost;
+  // connect the client
+  client.connect({onSuccess:onConnect});
+
+  // called when the client connects
+  function onConnect() {
+    // Once a connection has been made, make a subscription and send a message.
+    console.log("onConnect");
+    message = new Paho.MQTT.Message(configJson);
+    message.destinationName = "devices/" + deviceId + "/smart_frame/update_media";
+    message.qos = 1;
+    client.send(message);
+  }
+
+  // called when the client loses its connection
+  function onConnectionLost(responseObject) {
+    if (responseObject.errorCode !== 0) {
+      console.log("onConnectionLost:"+responseObject.errorMessage);
+    }
+  }
+}
 

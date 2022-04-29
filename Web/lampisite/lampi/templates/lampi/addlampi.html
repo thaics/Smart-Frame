@@ -1,6 +1,10 @@
 {% extends "lampi/base.html" %}
-
+{% load static %}
 {% block title %}Add LAMPI{% endblock %}
+
+{% block additional_head_content %}
+    <link rel="stylesheet" type="text/css" href="{% static 'lampi/css/site.css' %}"/>
+{% endblock %}
 
 {% block content %}
 <form action="" method="post">
@@ -9,5 +13,3 @@
     <input type="submit" value="Add LAMPI" />
 </form>
 {% endblock %}
-
-{% block page_event %}Add LAMPI{% endblock %}

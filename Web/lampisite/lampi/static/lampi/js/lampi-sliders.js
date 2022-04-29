@@ -70,3 +70,5 @@ function updateBrightnessThumb(brightness) {
   color = tinycolor({ h:1.0, s:0.0, v:brightness });
   updateThumbColor("#brightness-thumb-style", ".brightness", color);
 }
+
+
